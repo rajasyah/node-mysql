@@ -1,11 +1,10 @@
 const express = require("express");
-const routeProduct = express.Router();
+const productRouter = express.Router();
+const connection = require("../config/mysql");
+const productController = require("../controller/product");
 
-routeProduct.get("/product", (req, res) => {
-  res.send({
-    status: "success",
-    message: "product page",
-  });
-});
+productRouter.get("/product", productController.index);
 
-module.exports = routeProduct;
+productRouter.get("/product/:id", productController.sort);
+
+module.exports = productRouter;
