@@ -1,12 +1,19 @@
 const connection = require("../config/mysql");
 
 const index = (req, res) => {
-  connection.query(
-    {
+  const { search } = req.query;
+  let exec = {};
+  if (search) {
+    exec = {
+      sql: "select * from products where name like ?",
+      values: [`%${search}%`],
+    };
+  } else {
+    exec = {
       sql: "select * from products",
-    },
-    _response(res)
-  );
+    };
+  }
+  connection.query(exec, _response(res));
 };
 
 const sort = (req, res) => {
@@ -14,6 +21,37 @@ const sort = (req, res) => {
     {
       sql: "select * from products where id = ?",
       values: [req.params.id],
+    },
+    _response(res)
+  );
+};
+
+const destroy = (req, res) => {
+  connection.query(
+    {
+      sql: "delete from products where id = ?",
+      values: [req.params.id],
+    },
+    _response(res)
+  );
+};
+
+const store = (req, res) => {
+  const { name, price, stock, status } = req.body;
+  connection.query(
+    {
+      sql: "INSERT INTO products (name,price,stock,status) VALUES (?,?,?,?) ",
+      values: [name, price, stock, status],
+    },
+    _response(res)
+  );
+};
+const update = (req, res) => {
+  const { name, price, stock, status } = req.body;
+  connection.query(
+    {
+      sql: "UPDATE products SET name = ?, price = ?, stock = ?, status = ? WHERE id = ? ",
+      values: [name, price, stock, status, req.params.id],
     },
     _response(res)
   );
@@ -38,4 +76,7 @@ const _response = (res) => {
 module.exports = {
   index,
   sort,
+  store,
+  update,
+  destroy,
 };
